@@ -1,0 +1,2 @@
+rootProject.name='MyVocalizeApp'
+include ':app', ':KVM-Models-1.0.2'
