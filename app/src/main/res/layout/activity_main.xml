@@ -9,59 +9,70 @@
     <Button
         android:id="@+id/butSpeak"
         android:layout_width="wrap_content"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="156dp"
-        android:layout_marginTop="48dp"
         android:layout_marginEnd="167dp"
         android:backgroundTint="#00BCD4"
         android:text="Say a sentence"
         android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.457"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        tools:layout_editor_absoluteY="54dp">
         SAY SOMETHING</Button>
+
+    <Button
+        android:id="@+id/butSayNumbers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="155dp"
+        android:layout_marginTop="41dp"
+        android:layout_marginEnd="168dp"
+        android:backgroundTint="#00BCD4"
+        android:text="Ask Numbers"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.44"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/butSpeak" />
+
+    <Button
+        android:id="@+id/butDictate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:backgroundTint="#00BCD4"
+        android:text="DICTATE A NOTE"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/butSayNumbers" />
+
+    <Button
+        android:id="@+id/butIntentInstruction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="43dp"
+        android:backgroundTint="#00BCD4"
+        android:text="TEST INTENT"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/butDictate" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="72dp"
         android:fontFamily="sans-serif-black"
         android:text="Waiting..."
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/butDictate" />
-
-    <Button
-        android:id="@+id/butSayNumbers"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:layout_marginStart="155dp"
-        android:layout_marginEnd="168dp"
-        android:backgroundTint="#00BCD4"
-        android:text="Ask Numbers"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.44"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/butSpeak"
-        app:layout_constraintVertical_bias="0.23" />
-
-    <Button
-        android:id="@+id/butDictate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:backgroundTint="#00BCD4"
-        android:text="DICTATE A NOTE"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/butSayNumbers" />
+        app:layout_constraintTop_toBottomOf="@+id/butIntentInstruction" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
