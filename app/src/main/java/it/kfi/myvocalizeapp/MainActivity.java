@@ -44,11 +44,18 @@ public class MainActivity extends AppCompatActivity {
     private static final String EXTRA_COMMAND = "it.kfi.kvm.intentservice.extra.COMMAND";
     private static final String EXTRA_RECEIVER = "it.kfi.kvm.intentservice.extra.RECEIVER";
     private static final String EXTRA_RESULTS = "it.kfi.kvm.intentservice.extra.RESULTS";
+    private static final String ACTION_GET_SERIALNUMBER = "it.kfi.kvm.intentservice.action.SERIALNUMBER";
+    private static final String ACTION_GET_LICENSE_STATE = "it.kfi.kvm.intentservice.action.LICENSE_STATE";
+    private static final String ACTION_CONFIGURE_VOCALIZE = "it.kfi.kvm.intentservice.action.CONFIG_VOCALIZE";
+
 
     Button butSay;
     Button butSpeakNumbers;
     Button butDictateNote;
-    Button butTestIntent;
+    Button butGetSerial;
+    Button butGetLicense;
+    Button butHeadset;
+    Button butVocalize;
 
     public enum MainMessages {
         TO_BE_LOGGED(0),
@@ -82,7 +89,10 @@ public class MainActivity extends AppCompatActivity {
         setButtonSay();
         setButtongetNumbers();
         setButtonDictateNote();
-        setButtonTestIntent();
+        setButtonGetSerial();
+        setButtonGetLicense();
+        setButtonHeadset();
+        setButtonVocalize();
 
         if(bIntenDriven){
             enableAllButtons(false);
@@ -95,20 +105,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 butSay.setEnabled(false);
+
                 showtextInView("Working...");
                 if (bIntenDriven) {
                     KVMCommands vis = new KVMCommands();
                     vis.newBuilder("speakOnlyPrompt")
-                            .setPrompt("Dite pronto se siete pronti!")
+                            .setPrompt("that's a simple sentence!")
                             .setResultType(CONSTANTS.ResultType.NONE)
                             .buildAndAdd();
-                    sendCommandThroughIntent(vis);
+
+                    Gson G = new Gson();
+                    String json = G.toJson(vis, KVMCommands.class);
+                    sendCommandThroughIntent(json);
+
                 } else {
-                    VoicePrompts.speakOnlyPrompt("Dite pronto se siete pronti!", new KVMHelper.IVISCallback() {
+                    VoicePrompts.speakOnlyPrompt("that's a simple sentence!", new KVMHelper.IVISCallback() {
                         @Override
                         public void onCompleted(ExitCodes exitCode) {
                             butSay.setEnabled(true);
-                            showtextInView("Fatto!");
+                            showtextInView("Done!");
                         }
 
                         @Override
@@ -121,7 +136,6 @@ public class MainActivity extends AppCompatActivity {
 
                         }
                     });
-
                 }
             }
         });
@@ -135,15 +149,18 @@ public class MainActivity extends AppCompatActivity {
 
                 KVMCommands voiceCmds = new KVMCommands();
                 voiceCmds.newBuilder("demoNumbers")
-                        .setPrompt("dite una serie di numeri")
-                        .addGrammar("luxtest")
-                        .setResultType(CONSTANTS.ResultType.RESULT_FROM_VOICE)
+                        .setPrompt("please pronounce a series of digits")
+                        .addGrammar("sil_digits_en")
+                        .setResultType(CONSTANTS.ResultType.RESULTS_FROM_VOICE_AND_BLUETOOTH)
                         .buildAndAdd();
 
                 showtextInView("Working...");
 
-                if (bIntenDriven)
-                    sendCommandThroughIntent(voiceCmds);
+                if (bIntenDriven) {
+                    Gson G = new Gson();
+                    String json = G.toJson(voiceCmds, KVMCommands.class);
+                    sendCommandThroughIntent(json);
+                }
                 else
                     KVMHelper.getKVMHelper().execInstructions(voiceCmds, new KVMHelper.IVISCallback() {
                         @Override
@@ -172,12 +189,15 @@ public class MainActivity extends AppCompatActivity {
                 showtextInView("Working...");
                 KVMCommands voiceCmds = new KVMCommands();
                 voiceCmds.newBuilder("demoNumbers")
-                        .setPrompt("pronuncia una nota libera", PromptPriority.NO_PRIORITY)
+                        .setPrompt("dictate a free message", PromptPriority.NO_PRIORITY)
                         .setResultType(CONSTANTS.ResultType.RESULT_FROM_VOICE)
                         .buildAndAdd();
 
-                if (bIntenDriven)
-                    sendCommandThroughIntent(voiceCmds);
+                if (bIntenDriven){
+                    Gson G = new Gson();
+                    String json = G.toJson(voiceCmds, KVMCommands.class);
+                    sendCommandThroughIntent(json);
+                }
                 else
                     KVMHelper.getKVMHelper().execInstructions(voiceCmds, new KVMHelper.IVISCallback() {
                         @Override
@@ -197,21 +217,54 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setButtonTestIntent() {
-        butTestIntent = findViewById(R.id.butIntentInstruction);
-        butTestIntent.setOnClickListener(new View.OnClickListener() {
+    private void setButtonGetSerial(){
+        butGetSerial = findViewById(R.id.butGetSerial);
+        butGetSerial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                showtextInView("build Vocalize command...");
-                String voiceCmds = buildDemoIntentCommand();
-
-                showtextInView("send Intent to Vocalize service...");
-                sendCommandThroughIntent(voiceCmds);
-
+                enableAllButtons(false);
+                Intent intent = new Intent();
+                intent.setAction(ACTION_GET_SERIALNUMBER);
+                sendBroadcast(intent);
             }
         });
-        butTestIntent.setEnabled(bIntenDriven);
+    }
+
+    private void setButtonGetLicense(){
+        butGetLicense = findViewById(R.id.butGetLicence);
+        butGetLicense.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                enableAllButtons(false);
+                Intent intent = new Intent();
+                intent.setAction(ACTION_GET_LICENSE_STATE);
+                sendBroadcast(intent);
+            }
+        });
+    }
+
+    private void setButtonHeadset(){
+        butHeadset = findViewById(R.id.butStartHeadseConfig);
+        butHeadset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setAction(ACTION_CONFIGURE_HEADSET);
+                sendBroadcast(intent);
+            }
+        });
+    }
+
+    private void setButtonVocalize(){
+        butVocalize = findViewById(R.id.butStartConfig);
+        butVocalize.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setAction(ACTION_CONFIGURE_VOCALIZE);
+                sendBroadcast(intent);
+            }
+        });
     }
 
     private void startVocalizeService() {
@@ -228,33 +281,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             this.startService(intent);
         }
-    }
-
-    private String buildDemoIntentCommand() {
-        KVMCommands voiceCmds = new KVMCommands();
-        voiceCmds.newBuilder("promptIntent")
-                .setPrompt("comando tramite intent", PromptPriority.NO_PRIORITY)
-                .setResultType(CONSTANTS.ResultType.RESULT_FROM_VOICE)
-                .buildAndAdd();
-        voiceCmds.newBuilder("numberIntent")
-                .setPrompt("dite qualche numero")
-                .setResultType(CONSTANTS.ResultType.RESULT_FROM_VOICE)
-                .addGrammar("sil_digits")
-                .buildAndAdd();
-
-        Gson G = new Gson();
-
-        return G.toJson(voiceCmds, KVMCommands.class);
-    }
-
-    private void sendCommandThroughIntent(KVMCommands voiceCmds) {
-        enableAllButtons(false);
-        Intent intent = new Intent();
-        intent.setAction("it.kfi.kvm.intentservice.action.VOCALIZE");
-        Bundle B = new Bundle();
-        B.putParcelable("kvmcommand", voiceCmds);
-        intent.putExtra("it.kfi.kvm.intentservice.extra.COMMAND", B);
-        sendBroadcast(intent);
     }
 
     private void sendCommandThroughIntent(String voiceCmds) {
@@ -276,7 +302,6 @@ public class MainActivity extends AppCompatActivity {
 
             showtextInView(respToShow);
         }
-
     }
 
     private void showtextInView(String textToShow) {
@@ -305,7 +330,8 @@ public class MainActivity extends AppCompatActivity {
                 butDictateNote.setEnabled(benable);
                 butSay.setEnabled(benable);
                 butSpeakNumbers.setEnabled(benable);
-                butTestIntent.setEnabled(benable);
+                butGetLicense.setEnabled(benable);
+                butGetSerial.setEnabled(benable);
             }
         });
     }
@@ -345,7 +371,8 @@ public class MainActivity extends AppCompatActivity {
             if (action.equals("it.kfi.kvm.intentservice.RESULTS")) {
                 Bundle command = intent.getBundleExtra(EXTRA_RESULTS);
                 String answer = command.getString("results");
-                showtextInView(answer);
+                String type = command.getString("type");
+                showtextInView(answer + "\n(" + type + ")");
                 enableAllButtons(true);
             }
 
@@ -354,4 +381,16 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
+    private void stopVocalize(){
+        Intent intent = new Intent();
+        intent.setClassName("it.kfi.kvm", "it.kfi.kvm.intentservice.VocalizeService");
+        this.stopService(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopVocalize();
+        super.onDestroy();
+    }
 }
