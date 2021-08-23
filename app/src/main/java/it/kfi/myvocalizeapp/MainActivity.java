@@ -287,6 +287,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startVocalizeServiceActivityTask() {
+        /**
+         * this is needed to make Vocalize Configuration activities visibile on top of
+         * this task stack (taskAffinity on manifest file has been set to "if.kfi.kvm")
+         */
         Intent sendIntent = new Intent();
         sendIntent.setAction("android.intent.action.VOCALIZE");
         sendIntent.addCategory(Intent.CATEGORY_DEFAULT);
