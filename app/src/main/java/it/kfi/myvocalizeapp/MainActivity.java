@@ -1,5 +1,6 @@
 package it.kfi.myvocalizeapp;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import it.kfi.kvm.library.CONSTANTS;
@@ -13,6 +14,7 @@ import vocalize.KVMHelper;
 import vocalize.PromptPriority;
 import vocalize.VoicePrompts;
 
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String ACTION_GET_SERIALNUMBER = "it.kfi.kvm.intentservice.action.SERIALNUMBER";
     private static final String ACTION_GET_LICENSE_STATE = "it.kfi.kvm.intentservice.action.LICENSE_STATE";
     private static final String ACTION_CONFIGURE_VOCALIZE = "it.kfi.kvm.intentservice.action.CONFIG_VOCALIZE";
+    private static final String EXTRA_ERRORMSG = "it.kfi.kvm.intentservice.extra.ERRORMSG";
 
 
     Button butSay;
@@ -283,6 +286,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void startVocalizeServiceActivityTask() {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction("android.intent.action.VOCALIZE");
+        sendIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        //sendIntent.putExtra(EXTRA_ERRORMSG, "vocalize ready");
+        try {
+            startActivityForResult(sendIntent, 111, null);
+        } catch (ActivityNotFoundException e) {
+            // Define what your app should do if no activity can handle the intent.
+        }
+
+    }
+
     private void sendCommandThroughIntent(String voiceCmds) {
         enableAllButtons(false);
         Intent intent = new Intent();
@@ -378,6 +394,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (action.equals("it.kfi.kvm.intentservice.STARTED")) {
                 enableAllButtons(true);
+                startVocalizeServiceActivityTask();
             }
         }
     };
@@ -392,5 +409,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         stopVocalize();
         super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 111){
+            enableAllButtons(true);
+        }
     }
 }
