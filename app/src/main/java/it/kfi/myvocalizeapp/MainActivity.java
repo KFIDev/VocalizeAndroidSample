@@ -14,6 +14,7 @@ import vocalize.KVMHelper;
 import vocalize.PromptPriority;
 import vocalize.VoicePrompts;
 
+import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     Button butGetLicense;
     Button butHeadset;
     Button butVocalize;
+    Button butReset;
 
     public enum MainMessages {
         TO_BE_LOGGED(0),
@@ -96,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
         setButtonGetLicense();
         setButtonHeadset();
         setButtonVocalize();
+        setButtonReset();
 
         if(bIntenDriven){
             enableAllButtons(false);
@@ -153,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                 KVMCommands voiceCmds = new KVMCommands();
                 voiceCmds.newBuilder("demoNumbers")
                         .setPrompt("please pronounce a series of digits")
-                        .addGrammar("sil_digits_en")
+                        .addGrammar("sil_digits")
                         .setResultType(CONSTANTS.ResultType.RESULTS_FROM_VOICE_AND_BLUETOOTH)
                         .buildAndAdd();
 
@@ -246,14 +249,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void setButtonReset(){
+        butReset = findViewById(R.id.butReset);
+        butReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setAction(ACTION_RESET);
+                sendBroadcast(intent);
+            }
+        });
+    }
+
     private void setButtonHeadset(){
         butHeadset = findViewById(R.id.butStartHeadseConfig);
         butHeadset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setAction(ACTION_CONFIGURE_HEADSET);
-                sendBroadcast(intent);
+                startVocalizeServiceActivityTask(111);
             }
         });
     }
@@ -263,9 +276,7 @@ public class MainActivity extends AppCompatActivity {
         butVocalize.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setAction(ACTION_CONFIGURE_VOCALIZE);
-                sendBroadcast(intent);
+                startVocalizeServiceActivityTask(112);
             }
         });
     }
@@ -286,7 +297,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void startVocalizeServiceActivityTask() {
+    private void startVocalizeServiceActivityTask(int requestCode) {
         /**
          * this is needed to make Vocalize Configuration activities visibile on top of
          * this task stack (taskAffinity on manifest file has been set to "if.kfi.kvm")
@@ -296,7 +307,7 @@ public class MainActivity extends AppCompatActivity {
         sendIntent.addCategory(Intent.CATEGORY_DEFAULT);
         //sendIntent.putExtra(EXTRA_ERRORMSG, "vocalize ready");
         try {
-            startActivityForResult(sendIntent, 111, null);
+            startActivityForResult(sendIntent, requestCode, null);
         } catch (ActivityNotFoundException e) {
             // Define what your app should do if no activity can handle the intent.
         }
@@ -398,7 +409,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (action.equals("it.kfi.kvm.intentservice.STARTED")) {
                 enableAllButtons(true);
-                startVocalizeServiceActivityTask();
+                startVocalizeServiceActivityTask(110);
             }
         }
     };
@@ -418,8 +429,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         if(requestCode == 111){
-            enableAllButtons(true);
+            Intent intent = new Intent();
+            intent.setAction(ACTION_CONFIGURE_HEADSET);
+            sendBroadcast(intent);
+        }
+        if(requestCode == 112){
+            Intent intent = new Intent();
+            intent.setAction(ACTION_CONFIGURE_VOCALIZE);
+            sendBroadcast(intent);
         }
     }
 }
