@@ -195,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
                 showtextInView("Working...");
                 KVMCommands voiceCmds = new KVMCommands();
                 voiceCmds.newBuilder("demoNumbers")
-                        .setPrompt("dictate a free message", PromptPriority.NO_PRIORITY)
+                        .setPrompt("dictate a free message", PromptPriority.LISTEN_MOST)
                         .setResultType(CONSTANTS.ResultType.RESULT_FROM_VOICE)
                         .buildAndAdd();
 
@@ -409,7 +409,6 @@ public class MainActivity extends AppCompatActivity {
 
             if (action.equals("it.kfi.kvm.intentservice.STARTED")) {
                 enableAllButtons(true);
-                startVocalizeServiceActivityTask(110);
             }
         }
     };
