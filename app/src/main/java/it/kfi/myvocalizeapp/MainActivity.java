@@ -36,9 +36,14 @@ import com.google.gson.Gson;
 
 public class MainActivity extends AppCompatActivity {
 
-    boolean isConfiguring;
     boolean isKVMPaused;
     boolean isOnSetup;
+
+    /**
+     * this select the way Vocalize service is invoke:
+     *  true: intent integration path
+     *  false: SDK integration path
+     */
     boolean bIntenDriven = true;
 
     private static final String ACTION_VOCALIZE = "it.kfi.kvm.intentservice.action.VOCALIZE";
@@ -105,6 +110,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Just speak a sentence
+     */
     private void setButtonSay() {
         butSay = findViewById(R.id.butSpeak);
         butSay.setOnClickListener(new View.OnClickListener() {
@@ -114,9 +122,12 @@ public class MainActivity extends AppCompatActivity {
 
                 showtextInView("Working...");
                 if (bIntenDriven) {
+                    /**
+                     * We use the SDK KVMCommands object to build the Json command string
+                     */
                     KVMCommands vis = new KVMCommands();
                     vis.newBuilder("speakOnlyPrompt")
-                            .setPrompt("that's a simple sentence!")
+                            .setPrompt("welcome the the world of vocalize!")
                             .setResultType(CONSTANTS.ResultType.NONE)
                             .buildAndAdd();
 
@@ -147,6 +158,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * This shows a grammar based voice interaction with the device
+     */
     private void setButtongetNumbers() {
         butSpeakNumbers = findViewById(R.id.butSayNumbers);
         butSpeakNumbers.setOnClickListener(new View.OnClickListener() {
@@ -156,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
                 KVMCommands voiceCmds = new KVMCommands();
                 voiceCmds.newBuilder("demoNumbers")
                         .setPrompt("please pronounce a series of digits")
-                        .addGrammar("sil_digits")
+                        .addGrammar("sil_digits_en")
                         .setResultType(CONSTANTS.ResultType.RESULTS_FROM_VOICE_AND_BLUETOOTH)
                         .buildAndAdd();
 
@@ -187,6 +201,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * This shows the message dictation capabilities of Vocalize
+     */
     private void setButtonDictateNote() {
         butDictateNote = findViewById(R.id.butDictate);
         butDictateNote.setOnClickListener(new View.OnClickListener() {
@@ -223,64 +240,94 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Retrieve the serial number of android device.
+     * Only work for Zebra and Honeywell devices
+     */
     private void setButtonGetSerial(){
         butGetSerial = findViewById(R.id.butGetSerial);
         butGetSerial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                enableAllButtons(false);
-                Intent intent = new Intent();
-                intent.setAction(ACTION_GET_SERIALNUMBER);
-                sendBroadcast(intent);
+                if(bIntenDriven){
+                    enableAllButtons(false);
+                    Intent intent = new Intent();
+                    intent.setAction(ACTION_GET_SERIALNUMBER);
+                    sendBroadcast(intent);
+                }
             }
         });
     }
 
+    /**
+     * Gets the Vocalize license state
+     * The license is retrieved fro the Vocalize Director web service
+     */
     private void setButtonGetLicense(){
         butGetLicense = findViewById(R.id.butGetLicence);
         butGetLicense.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                enableAllButtons(false);
-                Intent intent = new Intent();
-                intent.setAction(ACTION_GET_LICENSE_STATE);
-                sendBroadcast(intent);
+                if(bIntenDriven) {
+                    enableAllButtons(false);
+                    Intent intent = new Intent();
+                    intent.setAction(ACTION_GET_LICENSE_STATE);
+                    sendBroadcast(intent);
+                }
             }
         });
     }
 
+    /**
+     * Resets any pending dialog running commands set
+     */
     private void setButtonReset(){
         butReset = findViewById(R.id.butReset);
         butReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setAction(ACTION_RESET);
-                sendBroadcast(intent);
+                if(bIntenDriven){
+                    Intent intent = new Intent();
+                    intent.setAction(ACTION_RESET);
+                    sendBroadcast(intent);
+                }
             }
         });
     }
 
+    /**
+     * Calls the headset pairing activity
+     */
     private void setButtonHeadset(){
         butHeadset = findViewById(R.id.butStartHeadseConfig);
         butHeadset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startVocalizeServiceActivityTask(111);
+                if(bIntenDriven) {
+                    startVocalizeServiceActivityTask(111);
+                }
             }
         });
     }
 
+    /**
+     * Calls the setup Vocalize activity
+     */
     private void setButtonVocalize(){
         butVocalize = findViewById(R.id.butStartConfig);
         butVocalize.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startVocalizeServiceActivityTask(112);
+                if(bIntenDriven) {
+                    startVocalizeServiceActivityTask(112);
+                }
             }
         });
     }
 
+    /**
+     * Starts the Vocalize android service
+     */
     private void startVocalizeService() {
         IntentFilter filter = new IntentFilter();
         filter.addCategory(Intent.CATEGORY_DEFAULT);
